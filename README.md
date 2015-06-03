@@ -1,13 +1,6 @@
 # proxylab
 System programming lab assignment #5
 
-####################################################################
-# CS:APP Proxy Lab
-#
-# Student Source Files
-#
-####################################################################
-
 This directory contains the files you will need for the CS:APP Proxy Lab.
 
 * proxy.c
@@ -16,9 +9,6 @@ This directory contains the files you will need for the CS:APP Proxy Lab.
 >    These are starter files.  csapp.c and csapp.h are described in
 >    your textbook. You may make any changes you like to these files.
 >    And you may create and handin any additional files you like.
-
->    Please use `port_for_user.pl' (as described below) to generate a
->    port for your proxy.
 
 * README.md
 >    This file
