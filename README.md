@@ -8,8 +8,8 @@ This directory contains the files you will need for the Echo Proxy Lab.
 >    your textbook. You may make any changes you like to these files.
 >    And you may create and handin any additional files you like.
 
-* echoserver.c, echoclient.c
->    Echo client and server for brand new Lab.
+* echo.h, echo.c, echoserver.c, echoclient.c
+>    Echo client and server files for brand new Lab.
 
 * README.md
 >    This file
