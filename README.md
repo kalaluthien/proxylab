@@ -3,9 +3,7 @@ System programming lab assignment #5
 
 This directory contains the files you will need for the CS:APP Proxy Lab.
 
-* proxy.c
-* csapp.h
-* csapp.c
+* proxy.c, csapp.h, csapp.c
 >    These are starter files.  csapp.c and csapp.h are described in
 >    your textbook. You may make any changes you like to these files.
 >    And you may create and handin any additional files you like.
