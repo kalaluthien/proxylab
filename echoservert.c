@@ -39,9 +39,8 @@ void *echo_thread(void *vargp)
   pthread_t tid = pthread_self();
   int connfd = *((int *)vargp);
   Pthread_detach(pthread_self());
-  Free(vargp)
-
-    printf("Served by thread %d\n", (int) tid);
+  Free(vargp);
+  printf("Served by thread %d\n", (int) tid);
   sprintf(prefix, "Thread %d ", (int) tid);
   echo(connfd, prefix);
   Close(connfd);
