@@ -71,7 +71,7 @@ int main(int argc, char **argv)
   port = atoi(argv[1]);
   clientlen = sizeof(SA);
   listenfd = Open_listenfd(port);
-  t_arg.logfd = open(PROXY_LOG, O_CREAT|O_WRONLY|O_APPEND, 0);
+  t_arg.logfd = Open(PROXY_LOG, O_CREAT|O_RDWR|O_APPEND, 0677);
 
   /* accept concurrent clients */
   while (1)
@@ -119,35 +119,27 @@ void * process_request(void * vargp)
     /* check connection error */
     if ((connfd_s = connect_proxy(connfd_c, &rdwrbuf, &conn_sem)) < 0)
     {
-      if (connfd_s == -1)
-      {
-        fprintf(stderr, "Open error\n");
-        sprintf(rdwrbuf, "proxy usage: <host> <port> <message>\n");
-      }
-      else if (connfd_s == -2)
-      {
-        fprintf(stderr, "Open_clientfd DNS error\n");
-        sprintf(rdwrbuf, "Open_clientfd_ts DNS error\n");
-      }
-      else if (connfd_s == -3)
-      {
-        fprintf(stderr, "Open_clientfd Unix error\n");
-        sprintf(rdwrbuf, "Open_clientfd_ts Unix error\n");
-      }
-      else
+      if (connfd_s == -4)
       {
         fprintf(stderr, "Disconnect: %d\n", connfd_c);
         break;
       }
-      Rio_writen_w(connfd_c, rdwrbuf, strlen(rdwrbuf));
-      continue;
+      else
+      {
+        sprintf(rdwrbuf, "proxy usage: <host> <port> <message>\n");
+        Rio_writen_w(connfd_c, rdwrbuf, strlen(rdwrbuf));
+        continue;
+      }
     }
 
     /* read/write with echo_server */
     Rio_readinitb(&rio, connfd_s);
-
     Rio_writen_w(connfd_s, rdwrbuf, strlen(rdwrbuf));
-    nbytes += Rio_readlineb_w(&rio, rdwrbuf, strlen(rdwrbuf));
+    nbytes += Rio_readlineb_w(&rio, rdwrbuf, MAXLINE);
+
+    /* wite back to echo_client */
+    Rio_writen_w(connfd_c, rdwrbuf, strlen(rdwrbuf));
+    Close(connfd_s);
 
     /* save log */
     time(&timer);
@@ -160,16 +152,16 @@ void * process_request(void * vargp)
     P(&log_sem);
     Write(logfd, log, strlen(log));
     V(&log_sem);
-
-    /* wite back to echo_client */
-    Rio_writen_w(connfd_c, rdwrbuf, strlen(rdwrbuf));
-    Close(connfd_s);
   }
 
   Close(connfd_c);
   return NULL;
 }
 
+/*
+ * connect_proxy - Parse input (<host> <port> <message>) and
+ * make connection with proper echo server.
+ */
 int connect_proxy(int fd, char (* usrbuf)[MAXLINE], sem_t * mutexp)
 {
   rio_t rio;
@@ -191,9 +183,9 @@ int connect_proxy(int fd, char (* usrbuf)[MAXLINE], sem_t * mutexp)
 
   /* open socket as client of echo_server */
   fd = open_clientfd_ts(host, atoi(port), &conn_sem);
-  strcpy(*usrbuf, args);
 
-  return fd == -1 ? -3 : fd;
+  strcpy(*usrbuf, args);
+  return fd;
 }
 
 int open_clientfd_ts(char * hostname, int port, sem_t * mutexp)
@@ -202,7 +194,7 @@ int open_clientfd_ts(char * hostname, int port, sem_t * mutexp)
 
   /* lock the opening of client fd */
   P(mutexp);
-  fd = Open_clientfd(hostname, port);
+  fd = open_clientfd(hostname, port);
   V(mutexp);
 
   return fd;
