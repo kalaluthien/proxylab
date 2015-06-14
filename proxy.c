@@ -4,9 +4,15 @@
  * Student ID:  2013-11394
  *       Name:  Kim Hyung Mo
  *
- * IMPORTANT: Give a high level description of your code here. You
- * must also provide a header comment at the beginning of each
- * function that describes what that function does.
+ * Proxy acts as server to echo client, and as client to echo server.
+ *
+ * 1. To act as server, the proxy opens listenfd to accept echoclients.
+ * 2. When connection request accepted, the proxy make a worker thread to
+ *    serve echoclient.
+ * 3. Then the proxy opens clientfd to request to echoserver to act as client.
+ * 4. The proxy carrys out send/recieve performance, and return it back to
+ *    echoclient.
+ * 5. At the moment, the proxy saves log for interaction.
  */
 
 #include "csapp.h"
